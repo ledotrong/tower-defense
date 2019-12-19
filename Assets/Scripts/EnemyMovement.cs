@@ -2,50 +2,55 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(Enemy))]
-public class EnemyMovement : MonoBehaviour {
+public class EnemyMovement : MonoBehaviour
+{
 
-	private Transform target;
-	private int wavepointIndex = 0;
+    private Transform target;
+    private int wavepointIndex = 0;
 
-	private Enemy enemy;
+    private Enemy enemy;
 
-	void Start()
-	{
-		enemy = GetComponent<Enemy>();
+    void Start()
+    {
+        enemy = GetComponent<Enemy>();
 
-		target = Waypoints.points[0];
-	}
+        target = Waypoints.points[0];
+    }
 
-	void Update()
-	{
-		Vector3 dir = target.position - transform.position;
-		transform.Translate(dir.normalized * enemy.speed * Time.deltaTime, Space.World);
+    void Update()
+    {
+        Vector3 dir = target.position - transform.position;
+        transform.Translate(dir.normalized * enemy.speed * Time.deltaTime, Space.World);
+        Vector3 newDirection = Vector3.RotateTowards(transform.forward, dir, Time.deltaTime * 5f, 0f);
 
-		if (Vector3.Distance(transform.position, target.position) <= 0.4f)
-		{
-			GetNextWaypoint();
-		}
+        transform.rotation = Quaternion.LookRotation(newDirection);
 
-		enemy.speed = enemy.startSpeed;
-	}
+        if (Vector3.Distance(transform.position, target.position) <= 0.4f)
+        {
+            GetNextWaypoint();
+        }
 
-	void GetNextWaypoint()
-	{
-		if (wavepointIndex >= Waypoints.points.Length - 1)
-		{
-			EndPath();
-			return;
-		}
+        enemy.speed = enemy.startSpeed;
+    }
 
-		wavepointIndex++;
-		target = Waypoints.points[wavepointIndex];
-	}
+    void GetNextWaypoint()
+    {
+        if (wavepointIndex >= Waypoints.points.Length - 1)
+        {
+            EndPath();
+            return;
+        }
 
-	void EndPath()
-	{
-		PlayerStats.Lives--;
-		WaveSpawner.EnemiesAlive--;
-		Destroy(gameObject);
-	}
+        wavepointIndex++;
+        target = Waypoints.points[wavepointIndex];
+
+    }
+
+    void EndPath()
+    {
+        PlayerStats.Lives--;
+        WaveSpawner.EnemiesAlive--;
+        Destroy(gameObject);
+    }
 
 }
